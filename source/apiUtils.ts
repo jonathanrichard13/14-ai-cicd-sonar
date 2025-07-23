@@ -1,43 +1,32 @@
-// Utility file with various code smells and zombie code
+// Utility file for API operations
 
-// Poor function naming (code smell)
-export function doStuff<T>(data: T): T {
+// Utility function for deep cloning
+export function deepClone<T>(data: T): T {
   return JSON.parse(JSON.stringify(data));
 }
 
-// Function with security vulnerability - eval is dangerous
-export function dynamicEval(expression: string): unknown {
-  // Dangerous use of eval (security vulnerability)
-  return eval(expression);
+// Secure expression validator - replaced dangerous eval
+export function validateExpression(expression: string): boolean {
+  // Only allow simple mathematical expressions with numbers and basic operators
+  const safePattern = /^[0-9+\-*/().\s]+$/;
+  return safePattern.test(expression);
 }
 
-// Inconsistent error handling (code smell)
+// Improved date formatting with consistent error handling
 export function formatDate(date: Date | string): string {
   try {
     const d = typeof date === 'string' ? new Date(date) : date;
+    if (isNaN(d.getTime())) {
+      throw new Error('Invalid date');
+    }
     return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
   } catch (error) {
-    // Inconsistent error handling
-    console.log('Error formatting date:', error);
-    return '';
+    console.error('Error formatting date:', error);
+    throw new Error('Invalid date format');
   }
 }
 
-// Duplicate code - similar to formatDate (code smell)
-export function dateFormat(dateInput: Date | string): string {
-  try {
-    const d = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
-    const year = d.getFullYear();
-    const month = (d.getMonth() + 1).toString().padStart(2, '0');
-    const day = d.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  } catch (error) {
-    console.error('Date formatting error:', error);
-    return 'Invalid date';
-  }
-}
-
-// Zombie code - unused functions below
+// Temperature calculation utilities
 export function calculateAverageTemperature(temperatures: number[]): number {
   if (temperatures.length === 0) return 0;
   const sum = temperatures.reduce((acc, curr) => acc + curr, 0);
@@ -60,32 +49,11 @@ export function calculateMedianTemperature(temperatures: number[]): number {
   }
 }
 
-// Function with hardcoded credentials (vulnerability)
-export function getApiCredentials(): { key: string, secret: string } {
-  // Hardcoded API credentials (vulnerability)
+// Secure configuration management - using environment variables
+export function getApiConfiguration(): { key: string | null, secret: string | null } {
+  // Use environment variables instead of hardcoded credentials
   return {
-    key: 'api-key-1234567890',
-    secret: 'api-secret-abcdefghijk'
+    key: process.env.API_KEY || null,
+    secret: process.env.API_SECRET || null
   };
 }
-
-// Commented out but still present (zombie code)
-/*
-export function calculateWindChillIndex(temperature: number, windSpeed: number): number {
-  if (temperature > 10) return temperature; // Wind chill only applies when temp <= 10°C
-  
-  // Formula: 13.12 + 0.6215*T - 11.37*V^0.16 + 0.3965*T*V^0.16
-  // where T = air temperature (°C), V = wind speed (km/h)
-  return 13.12 + 
-         0.6215 * temperature - 
-         11.37 * Math.pow(windSpeed, 0.16) + 
-         0.3965 * temperature * Math.pow(windSpeed, 0.16);
-}
-
-export function calculateHeatIndex(temperature: number, humidity: number): number {
-  if (temperature < 27) return temperature; // Heat index only applies when temp >= 27°C
-  
-  // Simplified formula
-  return 0.5 * (temperature + 61.0 + ((temperature - 68.0) * 1.2) + (humidity * 0.094));
-}
-*/
