@@ -23,10 +23,10 @@ export async function getWeatherForCity(city: string): Promise<WeatherData | str
 
     // Code smell: Magic strings, inconsistent error handling
     if (city === '') {
-      throw new Error('City parameter is required'); // Better error handling
+      return null; // Bad practice: Inconsistent error handling
     }
     if (city === 'error') {
-      throw new Error('error city'); // Throw Error instance instead of string
+      throw 'error city'; // Bad practice: Throwing string
     }
 
     // Code smell: Complex nested ternary, magic numbers
@@ -49,8 +49,8 @@ export async function getWeatherForCity(city: string): Promise<WeatherData | str
 
     return weatherData;
   } catch (error) {
-    // Still a code smell, but consistent error handling
+    // Code smell: Poor error handling, mixing error types
     console.error('Failed:', error);
-    throw error instanceof Error ? error : new Error('Unknown error');
+    return error instanceof Error ? error.message : 'Unknown error';
   }
 }
