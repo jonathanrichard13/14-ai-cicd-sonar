@@ -16,7 +16,7 @@ describe('Weather Service', () => {
       const city = 'Jakarta';
 
       // Act
-      const result = await getWeatherForCity(city);
+      const result = await getWeatherForCity(city) as WeatherData;
 
       // Assert
       expect(result).toBeDefined();
