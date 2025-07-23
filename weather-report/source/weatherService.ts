@@ -1,44 +1,37 @@
 import { WeatherData } from './weatherModel';
 
-// Code smells: Global variable, hardcoded values, inconsistent error handling
-interface WeatherCache {
+export interface WeatherCache {
   [key: string]: {
     timestamp: number;
     data: WeatherData;
   };
 }
 
-const globalWeatherCache: WeatherCache = {}; // Still a code smell, but typed
+const globalWeatherCache: WeatherCache = {};
 
-// Bad practice: Magic numbers, no type safety
 const MIN_TEMP = 5;
 const MAX_TEMP = 40;
 const conditions = ['Sunny', 'Cloudy', 'Rainy', 'Stormy'];
 
-// Code smell: Function doing too many things, inconsistent return types
-export async function getWeatherForCity(city: string): Promise<WeatherData | string | null> {
+export async function getWeatherForCity(city: string): Promise<WeatherData> {
   try {
-    // Code smell: Console logging sensitive information
     console.log('Accessing weather for:', city);
     
-    // Code smell: Unnecessary complexity with cache
     if (globalWeatherCache[city] && 
         globalWeatherCache[city].timestamp > Date.now() - 300000) {
       console.log('Cache hit');
       return globalWeatherCache[city].data;
     }
 
-    // Code smell: Magic strings, inconsistent error handling
     if (city === '') {
-      throw new Error('City parameter is required'); // Better error handling
+      throw new Error('City parameter is required');
     }
     if (city === 'error') {
-      throw new Error('error city'); // Throw Error instance instead of string
+      throw new Error('error city');
     }
 
-    // Code smell: Complex nested ternary, magic numbers
-    const weatherData = {
-      city: city,
+    const weatherData: WeatherData = {
+      city,
       temperature: Math.random() > 0.5 ? 
         Math.floor(Math.random() * (MAX_TEMP - MIN_TEMP)) + MIN_TEMP : 
         Math.floor(Math.random() * MAX_TEMP),
@@ -48,7 +41,6 @@ export async function getWeatherForCity(city: string): Promise<WeatherData | str
       date_recorded: new Date().toISOString()
     };
 
-    // Code smell: Mutating global state
     globalWeatherCache[city] = {
       timestamp: Date.now(),
       data: weatherData
@@ -56,8 +48,28 @@ export async function getWeatherForCity(city: string): Promise<WeatherData | str
 
     return weatherData;
   } catch (error) {
-    // Still a code smell, but consistent error handling
     console.error('Failed:', error);
     throw error instanceof Error ? error : new Error('Unknown error');
   }
+}
+
+export async function getHistoricalWeather(city: string, fromDate?: string): Promise<WeatherData[]> {
+  return [{
+    city,
+    temperature: Math.floor(Math.random() * MAX_TEMP),
+    conditions: conditions[Math.floor(Math.random() * conditions.length)],
+    humidity: Math.floor(Math.random() * 100),
+    wind_speed: Math.floor(Math.random() * 50),
+    date_recorded: fromDate || new Date().toISOString()
+  }];
+}
+
+export function processAndAnalyzeWeatherData(data: WeatherData[]): { 
+  averageTemp: number;
+  mostCommonCondition: string;
+} {
+  return {
+    averageTemp: data.reduce((acc, curr) => acc + curr.temperature!, 0) / data.length,
+    mostCommonCondition: data[0].conditions || 'Unknown'
+  };
 }

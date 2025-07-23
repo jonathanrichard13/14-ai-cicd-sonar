@@ -11,7 +11,7 @@ app.get('/api/weather/:city', async (req, res) => {
     const weather = await getWeatherForCity(req.params.city);
     res.json(weather);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
   }
 });
 

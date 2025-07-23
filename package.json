@@ -1,7 +1,27 @@
 {
+  "name": "demo-repository",
+  "version": "1.0.0",
+  "description": "Demo repository with weather application",
+  "private": true,
+  "workspaces": [
+    "weather-report"
+  ],
+  "scripts": {
+    "install:all": "npm install && cd weather-report && npm install",
+    "build": "cd weather-report && npm run build",
+    "test": "cd weather-report && npm test",
+    "dev": "cd weather-report && npm run dev",
+    "start": "cd weather-report && npm start"
+  },
   "devDependencies": {
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.3",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^24.1.0",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
-    "eslint": "^9.31.0"
+    "eslint": "^9.31.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   }
 }

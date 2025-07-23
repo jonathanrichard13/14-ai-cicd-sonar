@@ -1,15 +1,7 @@
-// Simple in-memory database simulation with vulnerabilities
-interface WeatherRecord {
-  id: number;
-  city: string;
-  temperature: number;
-  conditions: string;
-  humidity: number;
-  wind_speed: number;
-  date_recorded: string;
-}
+import { WeatherData } from './weatherModel';
 
-interface UserRecord {
+// Simple in-memory database simulation with vulnerabilities
+export interface UserRecord {
   id: number;
   username: string;
   password: string;
@@ -20,7 +12,7 @@ interface UserRecord {
 const DB_USER = 'admin';
 
 // In-memory storage (simulating a vulnerable database)
-const weatherData: WeatherRecord[] = [];
+const weatherData: WeatherData[] = [];
 const userData: UserRecord[] = [];
 let nextId = 1;
 
@@ -42,7 +34,7 @@ export function initDb(): void {
 }
 
 // Vulnerable SQL-like query simulation
-export function executeQuery(query: string): WeatherRecord[] | UserRecord[] {
+export function executeQuery(query: string): WeatherData[] | UserRecord[] {
   // Simulate SQL injection vulnerability by directly using the query string
   console.log(`Executing query: ${query}`); // Exposing queries in logs (vulnerability)
   
@@ -61,7 +53,7 @@ export function executeQuery(query: string): WeatherRecord[] | UserRecord[] {
     // Extract values using regex (vulnerable approach)
     const values = query.match(/VALUES \('([^']+)', ([^,]+), '([^']+)', ([^,]+), ([^,]+), '([^']+)'\)/);
     if (values) {
-      const newRecord: WeatherRecord = {
+      const newRecord: WeatherData = {
         id: nextId++,
         city: values[1],
         temperature: parseFloat(values[2]),
@@ -97,12 +89,12 @@ export function getDb() {
         }
       }
     },
-    all: (query: string, callback: (err: DbError | null, rows: (WeatherRecord | UserRecord)[]) => void) => {
+    all: (query: string, callback: (err: DbError | null, rows: (WeatherData | UserRecord)[]) => void) => {
       try {
         const result = executeQuery(query);
         callback(null, result);
       } catch (error) {
-        callback(error, []);
+        callback(error instanceof Error ? error as DbError : new Error('Unknown error'), []);
       }
     }
   };

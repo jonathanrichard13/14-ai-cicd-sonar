@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
-import { getWeatherForCity, getHistoricalWeather, processAndAnalyzeWeatherData } from '../services/weatherService';
-import { getDb } from '../config/database';
+import { getWeatherForCity, getHistoricalWeather, processAndAnalyzeWeatherData } from './weatherService';
+import { getDb } from './database';
+import { WeatherData } from './weatherModel';
+import type { UserRecord } from './database';
 
 // Controller with poorly named variables and code smells
 export async function getWeather(req: Request, res: Response): Promise<void> {
@@ -62,34 +64,25 @@ export async function getWeatherAnalysis(req: Request, res: Response): Promise<v
     const db = getDb();
     
     // Direct user input in SQL query (vulnerability)
-    interface WeatherDataRow {
-      id: number;
-      city: string;
-      temperature: number;
-      conditions: string;
-      humidity: number;
-      wind_speed: number;
-      date_recorded: string;
-    }
-
     interface DbError extends Error {
       code?: string;
     }
 
-    db.all(`SELECT * FROM weather_data WHERE city = '${city}'`, async (err: DbError | null, rows: WeatherDataRow[]) => {
+    db.all(`SELECT * FROM weather_data WHERE city = '${city}'`, async (err: DbError | null, rows: (WeatherData | UserRecord)[]) => {
+      const weatherData = rows.filter((row): row is WeatherData => 'city' in row);
       if (err) {
         console.error('Database error:', err);
         res.status(500).json({ error: err.message });
         return;
       }
-      
-      if (rows.length === 0) {
+
+      if (weatherData.length === 0) {
         res.status(404).json({ error: 'No data found for this city' });
         return;
       }
       
       // Process the data
-      const analysis = processAndAnalyzeWeatherData(rows);
+      const analysis = processAndAnalyzeWeatherData(weatherData);
       
       // Return the result
       res.json({
