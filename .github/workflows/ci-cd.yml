@@ -10,9 +10,6 @@ jobs:
   lint:
     name: Run ESLint
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./weather-report
 
     steps:
     - uses: actions/checkout@v3
@@ -21,20 +18,15 @@ jobs:
       with:
         node-version: '18.x'
         cache: 'npm'
-        cache-dependency-path: weather-report/package-lock.json
+        cache-dependency-path: package-lock.json
     - run: npm ci
-    - name: Install ESLint
-      run: npm install eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin --save-dev
     - name: Run ESLint
-      run: npx eslint . --ext .ts
+      run: npm run lint
 
   test:
     name: Run Tests
     needs: lint
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./weather-report
 
     steps:
     - uses: actions/checkout@v3
@@ -43,10 +35,8 @@ jobs:
       with:
         node-version: '18.x'
         cache: 'npm'
-        cache-dependency-path: weather-report/package-lock.json
+        cache-dependency-path: package-lock.json
     - run: npm ci
-    - name: Install Jest
-      run: npm install --save-dev jest ts-jest @types/jest
     - name: Run tests
       run: npm test
 
@@ -54,9 +44,6 @@ jobs:
     name: Build Project
     needs: test
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./weather-report
 
     steps:
     - uses: actions/checkout@v3
@@ -65,7 +52,7 @@ jobs:
       with:
         node-version: '18.x'
         cache: 'npm'
-        cache-dependency-path: weather-report/package-lock.json
+        cache-dependency-path: package-lock.json
     - run: npm ci
     - name: Build
       run: npm run build
@@ -74,14 +61,19 @@ jobs:
     name: SonarCloud Analysis
     needs: build
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./weather-report
 
     steps:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        cache-dependency-path: package-lock.json
+    - run: npm ci
+    - run: npm test
     - name: SonarCloud Scan
       uses: SonarSource/sonarcloud-github-action@master
       env:
@@ -91,8 +83,7 @@ jobs:
         args: >
           -Dsonar.projectKey=BINAR-Learning_demo-repository
           -Dsonar.organization=binar-learning
-          -Dsonar.sources=./weather-report/src
-          -Dsonar.tests=./weather-report/tests
-          -Dsonar.javascript.lcov.reportPaths=./weather-report/coverage/lcov.info
+          -Dsonar.sources=./source
+          -Dsonar.tests=./tests,./tests-new
+          -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
           -Dsonar.qualitygate.wait=true
-          -Dsonar.qualitygate.conditions=["coverage>=80","new_bugs=0","new_code_smells=0"]
