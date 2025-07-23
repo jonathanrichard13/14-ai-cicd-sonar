@@ -75,7 +75,7 @@ jobs:
     - run: npm ci
     - run: npm test
     - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@master
+      uses: SonarSource/sonarqube-scan-action@v5.0.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -83,7 +83,3 @@ jobs:
         args: >
           -Dsonar.projectKey=BINAR-Learning_demo-repository
           -Dsonar.organization=binar-learning
-          -Dsonar.sources=./source
-          -Dsonar.tests=./tests,./tests-new
-          -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
-          -Dsonar.qualitygate.wait=true
