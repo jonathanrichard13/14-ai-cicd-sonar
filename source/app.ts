@@ -13,10 +13,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(morgan('dev')); // Logging middleware with default config (vulnerability)
-app.use(cors()); // Open CORS policy (vulnerability)
-app.use(bodyParser.json()); // Parse JSON bodies
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(morgan('combined')); // More secure logging format
+app.use(cors({
+  origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
+  credentials: true
+})); // Restricted CORS policy
+app.use(bodyParser.json({ limit: '10mb' })); // Add size limit
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
 // Initialize database
 initDb();
@@ -24,52 +27,22 @@ initDb();
 // Routes
 app.use('/api/weather', weatherRoutes);
 
-// Basic error handler - very generic (vulnerability: doesn't hide implementation details)
-app.use((err: Error, req: express.Request, res: express.Response) => {
-  console.error(err.stack);
+// Secure error handler - doesn't expose implementation details
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  // Log error securely (not exposing stack trace to client)
+  console.error('Application error:', err.message);
+  
   res.status(500).json({
-    error: err.message,
-    stack: err.stack // Exposing stack trace is a security vulnerability
+    error: 'Internal server error',
+    timestamp: new Date().toISOString()
   });
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-
-// For type imports
-import { cpus } from 'os';
-
-// Zombie code - unused function that never gets called
-export function checkSystemHealth(): {
-  status: string;
-  memory: NodeJS.MemoryUsage;
-  cpu: ReturnType<typeof cpus>;
-} {
-  console.log('Checking system health...');
-  
-  // More dead code
-  const memoryUsage = process.memoryUsage();
-  const cpuInfo = cpus();
-  
-  return {
-    status: 'ok',
-    memory: memoryUsage,
-    cpu: cpuInfo
-  };
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
 }
-
-/* 
-  Commented out code that doesn't do anything useful
-  This is just here to demonstrate a code smell
-  
-  function oldAuthFunction(user, pass) {
-    if (user === 'admin' && pass === 'password') {
-      return true;
-    }
-    return false;
-  }
-*/
 
 export default app;

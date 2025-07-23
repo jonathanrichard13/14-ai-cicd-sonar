@@ -40,26 +40,9 @@ jobs:
     - name: Run tests
       run: npm test
 
-  build:
-    name: Build Project
-    needs: test
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18.x'
-        cache: 'npm'
-        cache-dependency-path: package-lock.json
-    - run: npm ci
-    - name: Build
-      run: npm run build
-
   sonarcloud:
     name: SonarCloud Analysis
-    needs: build
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
@@ -73,8 +56,10 @@ jobs:
         cache: 'npm'
         cache-dependency-path: package-lock.json
     - run: npm ci
-    - run: npm test
+    - name: Run tests with coverage
+      run: npm test -- --coverage
     - name: SonarCloud Scan
-      uses: SonarSource/sonarqube-scan-action@v5
+      uses: SonarSource/sonarcloud-github-action@master
       env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

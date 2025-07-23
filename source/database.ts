@@ -1,42 +1,49 @@
 import { WeatherData } from './weatherModel';
+import * as crypto from 'crypto';
 
-// Simple in-memory database simulation with vulnerabilities
+// Simple in-memory database simulation with security improvements
 export interface UserRecord {
   id: number;
   username: string;
-  password: string;
+  passwordHash: string; // Store hashed passwords
   api_key: string;
+  createdAt: Date;
 }
 
-// Hardcoded credentials - serious vulnerability
-const DB_USER = 'admin';
-
-// In-memory storage (simulating a vulnerable database)
+// In-memory storage (simulating database)
 const weatherData: WeatherData[] = [];
 const userData: UserRecord[] = [];
 let nextId = 1;
 
+// Helper function to hash passwords securely
+function hashPassword(password: string): string {
+  return crypto.createHash('sha256').update(password + process.env.SALT || 'default-salt').digest('hex');
+}
+
 export function initDb(): void {
-  // Credentials are exposed in log (vulnerability)
-  console.log(`Initializing database with user ${DB_USER}`);
+  console.log('Initializing database...');
   
-  console.log('Connected to the in-memory database');
-  
-  // Insert default admin user with plain text password (vulnerability)
+  // Insert default admin user with hashed password
+  const adminPassword = process.env.ADMIN_PASSWORD || 'defaultAdminPass123!';
   userData.push({
     id: 1,
     username: 'admin',
-    password: 'admin123', // Plain text password (vulnerability)
-    api_key: 'defaultapikey123'
+    passwordHash: hashPassword(adminPassword), // Hashed password
+    api_key: process.env.ADMIN_API_KEY || crypto.randomBytes(32).toString('hex'),
+    createdAt: new Date()
   });
   
-  console.log('Database initialized with default data');
+  console.log('Database initialized successfully');
 }
 
-// Vulnerable SQL-like query simulation
+// Secure query execution with validation
 export function executeQuery(query: string): WeatherData[] | UserRecord[] {
-  // Simulate SQL injection vulnerability by directly using the query string
-  console.log(`Executing query: ${query}`); // Exposing queries in logs (vulnerability)
+  // Basic query validation to prevent injection
+  const allowedQueries = ['SELECT * FROM users', 'SELECT * FROM weather'];
+  
+  if (!allowedQueries.includes(query.trim())) {
+    throw new Error('Invalid query');
+  }
   
   if (query.includes('SELECT * FROM weather_data')) {
     // Vulnerable to SQL injection - we're just simulating the vulnerability
