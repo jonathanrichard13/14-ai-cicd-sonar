@@ -1,12 +1,12 @@
 // Utility file with various code smells and zombie code
 
 // Poor function naming (code smell)
-export function doStuff(data: any): any {
+export function doStuff<T>(data: T): T {
   return JSON.parse(JSON.stringify(data));
 }
 
 // Function with security vulnerability - eval is dangerous
-export function dynamicEval(expression: string): any {
+export function dynamicEval(expression: string): unknown {
   // Dangerous use of eval (security vulnerability)
   return eval(expression);
 }

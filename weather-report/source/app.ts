@@ -25,7 +25,7 @@ initDb();
 app.use('/api/weather', weatherRoutes);
 
 // Basic error handler - very generic (vulnerability: doesn't hide implementation details)
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: Error, req: express.Request, res: express.Response) => {
   console.error(err.stack);
   res.status(500).json({
     error: err.message,
@@ -38,13 +38,20 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
+// For type imports
+import { cpus } from 'os';
+
 // Zombie code - unused function that never gets called
-function checkSystemHealth() {
+export function checkSystemHealth(): {
+  status: string;
+  memory: NodeJS.MemoryUsage;
+  cpu: ReturnType<typeof cpus>;
+} {
   console.log('Checking system health...');
   
   // More dead code
   const memoryUsage = process.memoryUsage();
-  const cpuInfo = require('os').cpus();
+  const cpuInfo = cpus();
   
   return {
     status: 'ok',

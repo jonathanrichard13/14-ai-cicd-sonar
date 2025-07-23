@@ -16,16 +16,12 @@ interface UserRecord {
   api_key: string;
 }
 
-// Hardcoded database path - vulnerability
-const DB_PATH = './weather.db'; 
-
 // Hardcoded credentials - serious vulnerability
 const DB_USER = 'admin';
-const DB_PASS = 'supersecretpassword123';
 
 // In-memory storage (simulating a vulnerable database)
-let weatherData: WeatherRecord[] = [];
-let userData: UserRecord[] = [];
+const weatherData: WeatherRecord[] = [];
+const userData: UserRecord[] = [];
 let nextId = 1;
 
 export function initDb(): void {
@@ -46,7 +42,7 @@ export function initDb(): void {
 }
 
 // Vulnerable SQL-like query simulation
-export function executeQuery(query: string, params?: any[]): any[] {
+export function executeQuery(query: string): WeatherRecord[] | UserRecord[] {
   // Simulate SQL injection vulnerability by directly using the query string
   console.log(`Executing query: ${query}`); // Exposing queries in logs (vulnerability)
   
@@ -75,29 +71,33 @@ export function executeQuery(query: string, params?: any[]): any[] {
         date_recorded: values[6]
       };
       weatherData.push(newRecord);
-      return [{ lastID: newRecord.id }];
+      return [newRecord];
     }
   }
   
   return [];
 }
 
+interface DbError extends Error {
+  code?: string;
+}
+
 export function getDb() {
   // Return a mock database object with vulnerable methods
   return {
-    run: (query: string, callback?: (err: any) => void) => {
+    run: (query: string, callback?: (err: DbError | null) => void) => {
       try {
-        const result = executeQuery(query);
+        executeQuery(query);
         if (callback) {
           callback(null);
         }
       } catch (error) {
         if (callback) {
-          callback(error);
+          callback(error instanceof Error ? error : new Error(String(error)));
         }
       }
     },
-    all: (query: string, callback: (err: any, rows: any[]) => void) => {
+    all: (query: string, callback: (err: DbError | null, rows: (WeatherRecord | UserRecord)[]) => void) => {
       try {
         const result = executeQuery(query);
         callback(null, result);

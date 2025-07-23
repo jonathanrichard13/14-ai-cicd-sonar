@@ -1,7 +1,14 @@
 import { WeatherData } from './weatherModel';
 
 // Code smells: Global variable, hardcoded values, inconsistent error handling
-let globalWeatherCache: any = {}; // Bad practice: using any type
+interface WeatherCache {
+  [key: string]: {
+    timestamp: number;
+    data: WeatherData;
+  };
+}
+
+const globalWeatherCache: WeatherCache = {}; // Still a code smell, but typed
 
 // Bad practice: Magic numbers, no type safety
 const MIN_TEMP = 5;

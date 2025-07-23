@@ -18,12 +18,12 @@ export async function getWeather(req: Request, res: Response): Promise<void> {
       success: true,
       data: data
     });
-  } catch (e: any) {
+  } catch (e) {
     console.error('Controller error:', e);
     res.status(500).json({ 
       success: false, 
-      error: e.message,
-      stack: e.stack // Exposing error details (vulnerability)
+      error: e instanceof Error ? e.message : 'Unknown error',
+      // Removed stack trace for security
     });
   }
 }
@@ -45,12 +45,11 @@ export async function getCityHistory(req: Request, res: Response): Promise<void>
       success: true,
       data: data
     });
-  } catch (e: any) {
+  } catch (e) {
     console.error('Controller error:', e);
     res.status(500).json({ 
       success: false, 
-      error: e.message,
-      stack: e.stack // Exposing error details (vulnerability)
+      error: e instanceof Error ? e.message : 'Unknown error'
     });
   }
 }
@@ -63,7 +62,21 @@ export async function getWeatherAnalysis(req: Request, res: Response): Promise<v
     const db = getDb();
     
     // Direct user input in SQL query (vulnerability)
-    db.all(`SELECT * FROM weather_data WHERE city = '${city}'`, async (err: any, rows: any) => {
+    interface WeatherDataRow {
+      id: number;
+      city: string;
+      temperature: number;
+      conditions: string;
+      humidity: number;
+      wind_speed: number;
+      date_recorded: string;
+    }
+
+    interface DbError extends Error {
+      code?: string;
+    }
+
+    db.all(`SELECT * FROM weather_data WHERE city = '${city}'`, async (err: DbError | null, rows: WeatherDataRow[]) => {
       if (err) {
         console.error('Database error:', err);
         res.status(500).json({ error: err.message });
@@ -86,11 +99,11 @@ export async function getWeatherAnalysis(req: Request, res: Response): Promise<v
         analysis: analysis
       });
     });
-  } catch (e: any) {
+  } catch (e) {
     console.error('Analysis error:', e);
     res.status(500).json({ 
       success: false, 
-      error: e.message 
+      error: e instanceof Error ? e.message : 'Unknown error'
     });
   }
 }
@@ -122,8 +135,8 @@ export async function exportWeatherData(req: Request, res: Response): Promise<vo
     } else {
       res.json(data);
     }
-  } catch (e: any) {
-    res.status(500).json({ error: e.message });
+  } catch (e) {
+    res.status(500).json({ error: e instanceof Error ? e.message : 'Unknown error' });
   }
 }
 

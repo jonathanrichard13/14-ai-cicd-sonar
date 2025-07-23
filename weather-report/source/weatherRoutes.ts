@@ -34,7 +34,7 @@ weatherRoutes.get('/forecast', async (req, res) => {
 */
 
 // No input validation on this route (vulnerability)
-weatherRoutes.get('/search', (req: any, res: any) => {
+weatherRoutes.get('/search', (req: express.Request, res: express.Response) => {
   const query = req.query.q;
   
   // This should validate the query parameter but doesn't
