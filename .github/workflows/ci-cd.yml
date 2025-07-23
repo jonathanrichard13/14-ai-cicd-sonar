@@ -63,9 +63,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
-        fetch-depth: 0
+        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
     - name: Use Node.js
       uses: actions/setup-node@v3
       with:
@@ -75,11 +75,6 @@ jobs:
     - run: npm ci
     - run: npm test
     - name: SonarCloud Scan
-      uses: SonarSource/sonarqube-scan-action@v5.0.0
+      uses: SonarSource/sonarqube-scan-action@v5
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      with:
-        args: >
-          -Dsonar.projectKey=BINAR-Learning_demo-repository
-          -Dsonar.organization=binar-learning
