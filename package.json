@@ -1,29 +1,51 @@
 {
-  "name": "demo-repository",
+  "name": "weather-checker-app",
   "version": "1.0.0",
-  "description": "Demo repository with weather application",
-  "private": true,
-  "workspaces": [
-    "weather-report"
-  ],
+  "description": "Weather checker backend application with intentional vulnerabilities",
+  "main": "dist/app.js",
+  "private": false,
   "scripts": {
-    "ci": "npm ci && cd weather-report && npm ci",
-    "install:all": "npm install && cd weather-report && npm install",
-    "build": "cd weather-report && npm run build",
-    "test": "cd weather-report && npm test",
-    "dev": "cd weather-report && npm run dev",
-    "start": "cd weather-report && npm start",
-    "lint": "cd weather-report && npm run lint",
-    "audit": "npm audit && cd weather-report && npm audit"
+    "start": "node dist/app.js",
+    "dev": "ts-node source/app.ts",
+    "build": "tsc",
+    "test": "jest --coverage",
+    "lint": "eslint source/**/*.ts",
+    "ci": "npm ci",
+    "audit": "npm audit"
+  },
+  "keywords": [
+    "weather",
+    "api",
+    "vulnerable",
+    "practice",
+    "typescript",
+    "express"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "0.18.0",
+    "body-parser": "1.18.2",
+    "cors": "2.8.4",
+    "dotenv": "6.0.0",
+    "express": "4.16.0",
+    "morgan": "1.9.0"
   },
   "devDependencies": {
-    "@types/dotenv": "^6.1.1",
-    "@types/express": "^5.0.3",
-    "@types/morgan": "^1.9.10",
+    "@types/cors": "2.8.4",
+    "@types/dotenv": "^8.2.3",
+    "@types/express": "4.16.0",
+    "@types/jest": "^29.5.3",
+    "@types/morgan": "1.7.35",
     "@types/node": "^24.1.0",
+    "@types/node-fetch": "^2.6.12",
+    "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
     "eslint": "^9.31.0",
+    "jest": "^29.6.2",
+    "supertest": "^6.3.3",
+    "ts-jest": "^29.1.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }

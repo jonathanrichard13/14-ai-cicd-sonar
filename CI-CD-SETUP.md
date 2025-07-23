@@ -1,6 +1,6 @@
 # CI/CD Setup Guide
 
-This repository is now configured for proper CI/CD workflows.
+This repository is configured for proper CI/CD workflows with a unified structure.
 
 ## For CI/CD Pipelines
 
@@ -8,7 +8,7 @@ Use these commands in your CI/CD pipeline:
 
 ```bash
 # Install dependencies (clean install for reproducible builds)
-npm run ci
+npm ci
 
 # Run linting
 npm run lint
@@ -17,7 +17,7 @@ npm run lint
 npm run build
 
 # Run tests with coverage
-npm run test
+npm test
 
 # Security audit
 npm run audit
@@ -27,7 +27,7 @@ npm run audit
 
 ```bash
 # Install dependencies for development
-npm run install:all
+npm install
 
 # Start development server
 npm run dev
@@ -36,16 +36,48 @@ npm run dev
 npm run build
 
 # Run tests
-npm run test
+npm test
+
+# Run linting
+npm run lint
 ```
+
+## Unified Project Structure
+
+The project now has a clean, flat structure:
+
+```
+demo-repository/
+├── source/              # All TypeScript source code
+├── tests-new/           # All test files
+├── dist/                # Build output
+├── coverage/            # Test coverage reports
+├── node_modules/        # Single dependency folder
+├── package.json         # Single package configuration
+├── package-lock.json    # Single lock file for CI/CD
+├── tsconfig.json        # TypeScript configuration
+├── jest.config.js       # Jest test configuration
+└── .eslintrc.js        # ESLint configuration
+```
+
+## Benefits of Unified Structure
+
+- ✅ Single `node_modules` directory
+- ✅ Single `package.json` with all dependencies
+- ✅ Simplified CI/CD scripts
+- ✅ No nested project complexity
+- ✅ Faster dependency installation
+- ✅ Easier maintenance
 
 ## Files Required for CI/CD
 
-- `package-lock.json` (root) - Generated and committed for reproducible builds
-- `weather-report/package-lock.json` - Generated and committed for reproducible builds
+- `package-lock.json` - Committed for reproducible builds
+- `package.json` - Contains all scripts and dependencies
 
 ## Notes
 
-- Both package-lock.json files are now tracked in git for CI/CD reproducibility
-- Use `npm run ci` instead of `npm ci` directly for multi-package setup
-- All scripts can be run from the root directory
+- No more nested weather-report directory
+- All source code directly in `/source/`
+- All tests directly in `/tests-new/`
+- Single unified dependency management
+- Simplified build and test processes
