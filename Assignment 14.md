@@ -1,5 +1,9 @@
 # Assignment 14 - SonarCloud Quality Gate Fixes
 
+## Summary
+
+This project successfully resolved SonarCloud Quality Gate failures by addressing 4 critical issues: **Security Hotspots** (removed `eval()` and hardcoded credentials), **Coverage** (increased from 12.4% to 100% with comprehensive tests), **Code Duplication** (eliminated duplicate files and consolidated test structure), and **Reliability Rating** (improved from C to A by fixing error handling and removing console pollution). The fixes involved secure coding practices, extensive testing, project restructuring, and clean code implementation, resulting in a passing Quality Gate with 0 security hotspots, 0% duplication, and A-grade reliability.
+
 ## SonarCloud Quality Gate Success 📊
 
 ### Before (Failed Quality Gate):
@@ -7,6 +11,7 @@
 ![Failing Pull Request](image/failing_pull_request.png)
 
 ### After (Quality Gate Success):
+![Passed SonarCloud](image/passed_sonar.png)
 ![SonarCloud Quality Gate](https://img.shields.io/badge/Quality%20Gate-PASSED-brightgreen?style=for-the-badge&logo=sonarcloud)
 ![Coverage](https://img.shields.io/badge/Coverage-100%25-brightgreen?style=for-the-badge)
 ![Security](https://img.shields.io/badge/Security%20Hotspots-0-brightgreen?style=for-the-badge)
