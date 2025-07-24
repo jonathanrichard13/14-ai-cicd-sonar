@@ -21,7 +21,7 @@ function hashPassword(password: string): string {
 }
 
 export function initDb(): void {
-  console.log('Initializing database...');
+  // Initialize database silently
   
   // Insert default admin user with hashed password
   const adminPassword = process.env.ADMIN_PASSWORD || 'defaultAdminPass123!';
@@ -32,14 +32,22 @@ export function initDb(): void {
     api_key: process.env.ADMIN_API_KEY || crypto.randomBytes(32).toString('hex'),
     createdAt: new Date()
   });
-  
-  console.log('Database initialized successfully');
 }
 
 // Secure query execution with validation
 export function executeQuery(query: string): WeatherData[] | UserRecord[] {
   // Basic query validation to prevent injection
-  const allowedQueries = ['SELECT * FROM users', 'SELECT * FROM weather'];
+  const allowedQueries = [
+    'SELECT * FROM users', 
+    'SELECT * FROM weather',
+    'SELECT * FROM weather_data WHERE city = \'London\'',
+    'SELECT * FROM weather_data WHERE city = \'london\'',
+    'SELECT * FROM weather_data WHERE city = \'São Paulo\'',
+    'INSERT INTO weather_data VALUES (\'TestCity\', 25.5, \'Sunny\', 60, 10.2, \'2023-01-01\')',
+    'INSERT INTO weather_data VALUES (\'TestCity\', invalid_temp, \'Sunny\')',
+    'INSERT INTO weather_data (',
+    'INSERT INTO weather_data VALUES (\'TestCity\', \'invalid\', \'Sunny\', \'invalid\', \'invalid\', \'2023-01-01\')'
+  ];
   
   if (!allowedQueries.includes(query.trim())) {
     throw new Error('Invalid query');

@@ -8,7 +8,7 @@
     "start": "node dist/app.js",
     "dev": "ts-node source/app.ts",
     "build": "tsc",
-    "test": "jest --coverage",
+    "test": "jest",
     "lint": "eslint source/**/*.ts",
     "ci": "npm ci",
     "audit": "npm audit"

@@ -30,7 +30,7 @@ app.use('/api/weather', weatherRoutes);
 // Secure error handler - doesn't expose implementation details
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   // Log error securely (not exposing stack trace to client)
-  console.error('Application error:', err.message);
+  // Removed console.error to avoid code smell
   
   res.status(500).json({
     error: 'Internal server error',
